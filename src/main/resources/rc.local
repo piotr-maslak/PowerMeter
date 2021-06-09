@@ -1,0 +1,11 @@
+#!/bin/sh -e
+
+# Print the IP address
+_IP=$(hostname -I) || true
+if [ "$_IP" ]; then
+  printf "My IP address is %s\n" "$_IP"
+fi
+
+sudo nohup java -jar /home/pi/NetBeansProjects/PowerMetter-1.0-jar-with-dependencies.jar&
+
+exit 0

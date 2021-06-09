@@ -1,0 +1,5 @@
+sudo apt-get install wiringpi
+sudo apt-get update
+sudo apt install mosquitto mosquitto-clients
+sudo systemctl enable mosquitto
+sudo systemctl start mosquitto
