@@ -1,2 +1,2 @@
 # PowerMeter
-It turns a pulse electricity consumption meter into IOT (MQTT &amp; REST) Device
+It turns a pulse electricity consumption metering device into IOT (MQTT &amp; REST) Device
