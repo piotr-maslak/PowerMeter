@@ -1,4 +1,4 @@
-package pl.waw.maslak.powermetter;
+package pl.waw.maslak.powermeter;
 
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
@@ -12,7 +12,7 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-public class PowerMetter {
+public class PowerMeter {
 
     public static long timestamp1 = System.currentTimeMillis();
     public static long timestamp2 = System.currentTimeMillis();
@@ -24,7 +24,7 @@ public class PowerMetter {
     public static void main(String[] args) throws InterruptedException {
 
         String broker = "tcp://localhost:1883";
-        String clientId = "PowerCounter";
+        String clientId = "PowerMeter";
         MemoryPersistence persistence = new MemoryPersistence();
 
         try {
@@ -38,7 +38,7 @@ public class PowerMetter {
             sampleClient.publish("energy", new MqttMessage(String.format("%.4f", energy).getBytes()));
 
         } catch (MqttException ex) {
-            Logger.getLogger(PowerMetter.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PowerMeter.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         // gpio controller
@@ -58,18 +58,13 @@ public class PowerMetter {
                         sampleClient.publish("power", new MqttMessage(power.getBytes()));
                         sampleClient.publish("energy", new MqttMessage(String.format("%.4f", energy).getBytes()));
                     } catch (MqttException ex) {
-                        Logger.getLogger(PowerMetter.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(PowerMeter.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }
         });
 
         while (true) {
-//            try {
-//                sampleClient.publish("power", new MqttMessage(power.getBytes()));
-//            } catch (MqttException ex) {
-//                Logger.getLogger(PowerMetter.class.getName()).log(Level.SEVERE, null, ex);
-//            }
             Thread.sleep(1000);
         }
     }
