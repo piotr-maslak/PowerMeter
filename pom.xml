@@ -64,7 +64,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>pl.waw.maslak.powermetter.PowerMetter</mainClass>
+                            <mainClass>pl.waw.maslak.powermeter.PowerMeter</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -87,41 +87,47 @@
                 <version>1.7</version>
                 <executions>
                     <execution>
-                        <id>server-copy</id>
+                        <id>server-copy-1</id>
                         <goals>
                             <goal>run</goal>
                         </goals>
                         <phase>package</phase>
                         <configuration>
-                            <!--                            <target>
-                                <echo message="Push to raspi"/>
-                                <scp trust="yes"
-                                     todir="pi:3.14@192.168.121.75:/home/pi/NetBeansProjects">
-                                    <fileset dir="${basedir}/target">
-                                        <include name="PowerMetter-1.0-jar-with-dependencies.jar"/>
-                                    </fileset>
-                                </scp>
-                            </target>-->
                             <target>
-                                <echo message="Push to raspi2"/>
+                                <echo message="Push to raspi.hector"/>
                                 <scp trust="yes"
-                                     todir="pi:raspberry@192.168.121.91:/home/pi/NetBeansProjects">
+                                     todir="pi:Wyszogrodzka6@192.168.121.64:/home/pi/powermeter">
                                     <fileset dir="${basedir}/target">
-                                        <include name="PowerMetter-1.0-jar-with-dependencies.jar"/>
-                                    </fileset>
-                                </scp>
-                            </target>
-                            <target>
-                                <echo message="Push to raspi.dom"/>
-                                <scp trust="yes"
-                                     todir="pi:raspberry@192.168.234.103:/home/pi/NetBeansProjects">
-                                    <fileset dir="${basedir}/target">
-                                        <include name="PowerMetter-1.0-jar-with-dependencies.jar"/>
+                                        <include name="PowerMeter-1.0-jar-with-dependencies.jar"/>
                                     </fileset>
                                 </scp>
                             </target>
                         </configuration>
                     </execution>
+                    
+                    
+                    
+                    <execution>
+                        <id>server-copy-2</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <echo message="Push to raspi.dom"/>
+                                <scp trust="yes"
+                                     port="2234"
+                                     todir="pi:Wyszogrodzka6@89.71.4.131:/home/pi/powermeter">
+                                    <fileset dir="${basedir}/target">
+                                        <include name="PowerMeter-1.0-jar-with-dependencies.jar"/>
+                                    </fileset>
+                                </scp>
+                            </target>
+                        </configuration>
+                    </execution>
+                    
+                    
                 </executions>
                 <dependencies>
                     <dependency>
