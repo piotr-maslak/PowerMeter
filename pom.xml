@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>pl.waw.maslak</groupId>
+    <artifactId>PowerMeter</artifactId>
+    <version>1.0</version>
+    <packaging>jar</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+    <repositories>
+        <repository>
+            <id>oss-snapshots-repo</id>
+            <name>Sonatype OSS Maven Repository</name>
+            <url>https://oss.sonatype.org/content/groups/public</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>Eclipse Paho Repo</id>
+            <url>https://repo.eclipse.org/content/repositories/paho-releases/</url>
+        </repository>
+    </repositories>
+    <dependencies>
+        <dependency>
+            <groupId>com.pi4j</groupId>
+            <artifactId>pi4j-core</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.paho</groupId>
+            <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+            
+            
+            
+            <plugin>
+                <!-- groupId org.apache.maven.plugins is assumed by default, so 
+                there is no need to specify it here. -->
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>pl.waw.maslak.powermetter.PowerMetter</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>                            
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>server-copy</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <!--                            <target>
+                                <echo message="Push to raspi"/>
+                                <scp trust="yes"
+                                     todir="pi:3.14@192.168.121.75:/home/pi/NetBeansProjects">
+                                    <fileset dir="${basedir}/target">
+                                        <include name="PowerMetter-1.0-jar-with-dependencies.jar"/>
+                                    </fileset>
+                                </scp>
+                            </target>-->
+                            <target>
+                                <echo message="Push to raspi2"/>
+                                <scp trust="yes"
+                                     todir="pi:raspberry@192.168.121.91:/home/pi/NetBeansProjects">
+                                    <fileset dir="${basedir}/target">
+                                        <include name="PowerMetter-1.0-jar-with-dependencies.jar"/>
+                                    </fileset>
+                                </scp>
+                            </target>
+                            <target>
+                                <echo message="Push to raspi.dom"/>
+                                <scp trust="yes"
+                                     todir="pi:raspberry@192.168.234.103:/home/pi/NetBeansProjects">
+                                    <fileset dir="${basedir}/target">
+                                        <include name="PowerMetter-1.0-jar-with-dependencies.jar"/>
+                                    </fileset>
+                                </scp>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.ant</groupId>
+                        <artifactId>ant-jsch</artifactId>
+                        <version>1.10.7</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            
+        </plugins>
+    </build>
+    <name>PowerMeter</name>
+</project>
