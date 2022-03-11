@@ -20,6 +20,8 @@ public class PowerMeter {
     public static double energy = 0;
     public static MqttClient sampleClient;
     //public static MqttMessage message;
+	
+	//abc
 
     public static void main(String[] args) throws InterruptedException {
 
