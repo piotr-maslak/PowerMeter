@@ -14,8 +14,9 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class PowerMeter {
 
-    public static String host = "iot.maslak.waw.pl";
-    public static String client_id = "powermeter";
+    public static String host = "test.mosquitto.org";
+    public static String port = "1883";
+    public static String client_id = "power-meter";
     public static String topic_prefix = "";
     public static String username = "maslak";
     public static String password = "maslak";
@@ -35,6 +36,9 @@ public class PowerMeter {
             if (arg.equalsIgnoreCase("-host")) {
                 host = value;
             }
+            if (arg.equalsIgnoreCase("-port")) {
+                port = value;
+            }
             if (arg.equalsIgnoreCase("-client_id")) {
                 client_id = value;
             }
@@ -52,7 +56,7 @@ public class PowerMeter {
         MemoryPersistence persistence = new MemoryPersistence();
 
         try {
-            powerClient = new MqttClient("tcp://" + host + ":1883", client_id, persistence);
+            powerClient = new MqttClient("tcp://" + host + ":" + port, client_id, persistence);
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
             connOpts.setUserName(username);
