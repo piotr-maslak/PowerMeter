@@ -10,7 +10,7 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+//import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 public class PowerMeter {
 
@@ -29,6 +29,10 @@ public class PowerMeter {
     public static boolean first = true;
     public static String power = "0";
     public static double energy = 0;
+    public static int timeout = 60; // seconds
+    public static int interval = 1; // seconds
+    public static int pulses = 1000;
+
     public static MqttClient sampleClient;
     //public static MqttMessage message;
 
@@ -69,6 +73,20 @@ public class PowerMeter {
                 password = value;
                 connect = true;
             }
+            if (arg.equalsIgnoreCase("-timeout")) {
+                String value = args[++i];
+                timeout = Integer.parseInt(value);
+                connect = true;
+            }
+            if (arg.equalsIgnoreCase("-interval")) {
+                String value = args[++i];
+                interval = Integer.parseInt(value);
+                connect = true;
+            }
+            if (arg.equalsIgnoreCase("-pulses")) {
+                String value = args[++i];
+                pulses = Integer.parseInt(value);
+            }
             if (arg.equalsIgnoreCase("-verbose")) {
                 verbose = true;
             }
@@ -87,43 +105,54 @@ public class PowerMeter {
                     } else {
                         startTime = stopTime;
                         stopTime = System.currentTimeMillis();
-                        power = String.valueOf(3600000 / (stopTime - startTime));
+                        power = String.valueOf(3600 * pulses / (stopTime - startTime));
                     }
-                    energy = energy + 0.001;
+                    energy = energy + ((double) 1 / pulses);
                     if (verbose) {
                         System.out.println("power: " + power + ", energy: " + String.format("%.3f", energy));
                     }
                 }
             }
         });
+        // GPIO Listener
 
         if (connect) {
-            MemoryPersistence persistence = new MemoryPersistence();
             try {
-                powerClient = new MqttClient("tcp://" + host + ":" + port, client_id, persistence);
-                MqttConnectOptions connOpts = new MqttConnectOptions();
-                connOpts.setCleanSession(true);
-                if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
-                    connOpts.setUserName(username);
-                    connOpts.setPassword(password.toCharArray());
-                }
-                connOpts.setAutomaticReconnect(true);
-                if (verbose) {
-                    System.out.println("power: " + power + ", energy: " + String.format("%.3f", energy));
-                }
-                powerClient.connect(connOpts);
-                while (true) {
-
-                    powerClient.publish(topic_prefix + "power", new MqttMessage(power.getBytes()));
-                    powerClient.publish(topic_prefix + "energy", new MqttMessage(String.format("%.3f", energy).getBytes()));
-
-                    System.out.print(".");
-                    Thread.sleep(1000);
-                }
+                powerClient = new MqttClient("tcp://" + host + ":" + port, client_id);
             } catch (MqttException ex) {
                 Logger.getLogger(PowerMeter.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
+            MqttConnectOptions connOpts = new MqttConnectOptions();
+            connOpts.setCleanSession(true);
+            connOpts.setConnectionTimeout(timeout);
+            connOpts.setKeepAliveInterval(15);
+            if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
+                connOpts.setUserName(username);
+                connOpts.setPassword(password.toCharArray());
+            }
+            connOpts.setAutomaticReconnect(true);
+            if (verbose) {
+                System.out.println("power: " + power + ", energy: " + String.format("%.3f", energy));
+            }
 
+            try {
+                powerClient.connect(connOpts);
+            } catch (MqttException ex) {
+                System.out.println("before-while");
+                Logger.getLogger(PowerMeter.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            while (true) {
+                try {
+                    powerClient.publish(topic_prefix + "power", new MqttMessage(power.getBytes()));
+                    powerClient.publish(topic_prefix + "energy", new MqttMessage(String.format("%.3f", energy).getBytes()));
+                } catch (MqttException ex) {
+                    System.out.println("in-while");
+                    Logger.getLogger(PowerMeter.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                System.out.print(".");
+                Thread.sleep(interval * 1000);
+            }
+
+        }
     }
 }
