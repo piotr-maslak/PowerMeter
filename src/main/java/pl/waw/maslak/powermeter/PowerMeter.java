@@ -141,13 +141,14 @@ public class PowerMeter {
                 System.out.println("before-while");
                 Logger.getLogger(PowerMeter.class.getName()).log(Level.SEVERE, null, ex);
             }
-            while (true) {
+            while (connect) {
                 try {
                     powerClient.publish(topic_prefix + "power", new MqttMessage(power.getBytes()));
                     powerClient.publish(topic_prefix + "energy", new MqttMessage(String.format("%.3f", energy).getBytes()));
                 } catch (MqttException ex) {
                     System.out.println("in-while");
                     Logger.getLogger(PowerMeter.class.getName()).log(Level.SEVERE, null, ex);
+                    connect = false;
                 }
                 if (verbose) {
                     System.out.print(".");
