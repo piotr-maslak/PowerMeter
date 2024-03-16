@@ -149,10 +149,11 @@ public class PowerMeter {
                     System.out.println("in-while");
                     Logger.getLogger(PowerMeter.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                System.out.print(".");
+                if (verbose) {
+                    System.out.print(".");
+                }
                 Thread.sleep(interval * 1000);
             }
-
         }
     }
 }
