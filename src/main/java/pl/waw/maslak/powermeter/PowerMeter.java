@@ -116,6 +116,7 @@ public class PowerMeter {
         });
         // GPIO Listener
 
+        // MQTT Connector
         if (connect) {
             try {
                 powerClient = new MqttClient("tcp://" + host + ":" + port, client_id);
@@ -138,23 +139,28 @@ public class PowerMeter {
             try {
                 powerClient.connect(connOpts);
             } catch (MqttException ex) {
-                System.out.println("before-while");
+                // System.out.println("before-while");
                 Logger.getLogger(PowerMeter.class.getName()).log(Level.SEVERE, null, ex);
             }
             while (connect) {
                 try {
-                    powerClient.publish(topic_prefix + "power", new MqttMessage(power.getBytes()));
                     powerClient.publish(topic_prefix + "energy", new MqttMessage(String.format("%.3f", energy).getBytes()));
                 } catch (MqttException ex) {
-                    System.out.println("in-while");
-                    Logger.getLogger(PowerMeter.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(PowerMeter.class.getName()).log(Level.SEVERE, "The error was reported during energy publication", ex);
                     connect = false;
+                    gpio.shutdown();
                 }
-                if (verbose) {
-                    System.out.print(".");
+                try {
+                    powerClient.publish(topic_prefix + "power", new MqttMessage(power.getBytes()));
+                } catch (MqttException ex) {
+                    Logger.getLogger(PowerMeter.class.getName()).log(Level.SEVERE, "The error was reported during power publication", ex);
+                    connect = false;
+                    gpio.shutdown();
                 }
+                if (verbose) { System.out.print("."); }
                 Thread.sleep(interval * 1000);
             }
         }
+         // MQTT Connector
     }
 }
